@@ -49,7 +49,7 @@ function speakText(text: string, character: 'sensei' | 'tomo'): Promise<void> {
     utterance.lang = 'ja-JP'
     if (character === 'sensei') {
       utterance.pitch = 1.0
-      utterance.rate = 0.9
+      utterance.rate = 1.1
     } else {
       utterance.pitch = 1.4
       utterance.rate = 1.1
