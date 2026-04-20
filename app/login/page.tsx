@@ -24,7 +24,8 @@ export default function LoginPage() {
       if (error) {
         setError(error.message)
       } else {
-        setError('確認メールを送りました！メールを確認してください。')
+        router.push('/')
+        router.refresh()
       }
     } else {
       const { error } = await supabase.auth.signInWithPassword({ email, password })
