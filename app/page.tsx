@@ -249,12 +249,13 @@ export default function Home() {
 
     const recognition = new SpeechRecognition()
     recognition.lang = 'ja-JP'
-    // iOS SafariはinterimResultsが不安定なため無効化
-    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
-    recognition.interimResults = !isIOS
+    recognition.interimResults = true
     recognition.continuous = false
 
+    let gotResult = false
+
     recognition.onresult = (e: SpeechRecognitionEvent) => {
+      gotResult = true
       const result = e.results[e.results.length - 1]
       const text = result[0].transcript
       if (result.isFinal) {
@@ -273,7 +274,12 @@ export default function Home() {
       const text = interimTextRef.current
       interimTextRef.current = ''
       setInterimText('')
-      if (text.trim()) handleSend(text.trim())
+      if (text.trim()) {
+        handleSend(text.trim())
+      } else if (!gotResult) {
+        // 結果ゼロで終了 → iOSの音声入力設定が原因の可能性
+        alert('音声が認識されませんでした。\n\niPhoneの場合：\n設定 → 一般 → キーボード → 音声入力 をオン\n設定 → プライバシー → 音声認識 → Safari をオン')
+      }
     }
 
     recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
@@ -287,8 +293,8 @@ export default function Home() {
         'audio-capture': 'マイクが使えません。接続を確認してください。',
         'service-not-allowed': 'iOSの設定でマイクが許可されていません。\n設定 → Safari → マイク → 許可\nまたは設定 → プライバシー → マイク → Safari をオンにしてください。',
       }
-      const msg = messages[e.error]
-      if (msg) alert(msg)
+      // 未知のエラーも表示して原因を把握できるようにする
+      alert(messages[e.error] ?? `音声認識エラー: ${e.error}`)
     }
 
     recognitionRef.current = recognition
