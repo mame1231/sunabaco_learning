@@ -274,7 +274,7 @@ export default function Home() {
         'no-speech': '声が聞こえませんでした。もう一度試してね！',
         'network': 'ネットワークエラーです。\nインターネット接続を確認してください。',
         'audio-capture': 'マイクが使えません。接続を確認してください。',
-        'service-not-allowed': '音声サービスが許可されていません。\nHTTPS環境で試してください。',
+        'service-not-allowed': 'iOSの設定でマイクが許可されていません。\n設定 → Safari → マイク → 許可\nまたは設定 → プライバシー → マイク → Safari をオンにしてください。',
       }
       const msg = messages[e.error]
       if (msg) alert(msg)
