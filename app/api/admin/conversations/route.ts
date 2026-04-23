@@ -29,7 +29,7 @@ export async function GET(request: NextRequest) {
 
   const { data, error } = await supabaseAdmin
     .from('conversations')
-    .select('id, user_id, grade, messages, created_at, updated_at')
+    .select('id, user_id, grade, subject, messages, created_at, updated_at')
     .order('updated_at', { ascending: false })
 
   if (error) {

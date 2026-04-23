@@ -10,6 +10,7 @@ type Conversation = {
   id: string
   user_email: string
   grade: number
+  subject?: string
   messages: Message[]
   created_at: string
   updated_at: string
@@ -96,7 +97,7 @@ export default function AdminPage() {
               <div className="text-left">
                 <p className="font-medium text-gray-700 text-sm">{c.user_email}</p>
                 <p className="text-xs text-gray-400 mt-0.5">
-                  小学{c.grade}年生 · {c.messages.length}メッセージ · {new Date(c.updated_at).toLocaleString('ja-JP')}
+                  小学{c.grade}年生{c.subject ? ` · ${c.subject}` : ''} · {c.messages.length}メッセージ · {new Date(c.updated_at).toLocaleString('ja-JP')}
                 </p>
               </div>
               <span className="text-gray-400 text-lg">{expanded === c.id ? '▲' : '▼'}</span>
