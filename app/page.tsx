@@ -19,10 +19,13 @@ declare global {
     stop(): void
     onresult: ((e: SpeechRecognitionEvent) => void) | null
     onend: (() => void) | null
-    onerror: (() => void) | null
+    onerror: ((e: SpeechRecognitionErrorEvent) => void) | null
   }
   interface SpeechRecognitionEvent extends Event {
     readonly results: SpeechRecognitionResultList
+  }
+  interface SpeechRecognitionErrorEvent extends Event {
+    readonly error: string
   }
 }
 
@@ -221,11 +224,18 @@ export default function Home() {
   }
 
   function startRecording() {
+    // HTTPS（またはlocalhost）でないと音声APIは使えない
+    if (!window.isSecureContext) {
+      alert('音声入力はHTTPS接続が必要です。\nVercelなどのHTTPS環境でお試しください。')
+      return
+    }
+
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) {
       alert('音声入力に対応していません。\niPhone/iPadはSafari、AndroidはChromeをお使いください。')
       return
     }
+
     const recognition = new SpeechRecognition()
     recognition.lang = 'ja-JP'
     // iOS SafariはinterimResultsが不安定なため無効化
@@ -255,15 +265,28 @@ export default function Home() {
       if (text.trim()) handleSend(text.trim())
     }
 
-    recognition.onerror = () => {
+    recognition.onerror = (e: SpeechRecognitionErrorEvent) => {
       setRecording(false)
       interimTextRef.current = ''
       setInterimText('')
+      const messages: Record<string, string> = {
+        'not-allowed': 'マイクの使用が許可されていません。\nブラウザの設定でマイクを許可してください。',
+        'no-speech': '声が聞こえませんでした。もう一度試してね！',
+        'network': 'ネットワークエラーです。\nインターネット接続を確認してください。',
+        'audio-capture': 'マイクが使えません。接続を確認してください。',
+        'service-not-allowed': '音声サービスが許可されていません。\nHTTPS環境で試してください。',
+      }
+      const msg = messages[e.error]
+      if (msg) alert(msg)
     }
 
     recognitionRef.current = recognition
-    recognition.start()
-    setRecording(true)
+    try {
+      recognition.start()
+      setRecording(true)
+    } catch {
+      alert('音声認識の起動に失敗しました。ページを再読み込みして試してください。')
+    }
   }
 
   function stopRecording() {
