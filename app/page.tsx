@@ -126,6 +126,7 @@ export default function Home() {
   }
 
   async function handleSubjectSelect(s: string) {
+    unlockSpeech() // 科目タップ＝ユーザージェスチャーのタイミングでiOS TTSをアンロック
     setSubject(s)
     setBranchCount(0)
 
@@ -234,7 +235,6 @@ export default function Home() {
   }
 
   function startRecording() {
-    unlockSpeech()
     // HTTPS（またはlocalhost）でないと音声APIは使えない
     if (!window.isSecureContext) {
       alert('音声入力はHTTPS接続が必要です。\nVercelなどのHTTPS環境でお試しください。')
@@ -293,6 +293,7 @@ export default function Home() {
 
     recognitionRef.current = recognition
     try {
+      window.speechSynthesis.cancel() // 音声セッションを解放してからマイク起動
       recognition.start()
       setRecording(true)
     } catch {
