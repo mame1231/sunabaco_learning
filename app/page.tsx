@@ -223,12 +223,14 @@ export default function Home() {
   function startRecording() {
     const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition
     if (!SpeechRecognition) {
-      alert('このブラウザは音声認識に対応していません。Chromeをお使いください。')
+      alert('音声入力に対応していません。\niPhone/iPadはSafari、AndroidはChromeをお使いください。')
       return
     }
     const recognition = new SpeechRecognition()
     recognition.lang = 'ja-JP'
-    recognition.interimResults = true
+    // iOS SafariはinterimResultsが不安定なため無効化
+    const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    recognition.interimResults = !isIOS
     recognition.continuous = false
 
     recognition.onresult = (e: SpeechRecognitionEvent) => {
@@ -282,7 +284,7 @@ export default function Home() {
   // ── 学年選択 ──────────────────────────────────────────────────────
   if (phase === 'grade') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-amber-50 flex flex-col items-center justify-center p-8">
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-amber-50 flex flex-col items-center justify-center p-4 sm:p-8">
         <div className="absolute top-4 right-4 flex items-center gap-3">
           {user?.email === process.env.NEXT_PUBLIC_ADMIN_EMAIL && (
             <button
@@ -312,34 +314,34 @@ export default function Home() {
                 <span className="text-lg">👤</span>
               )}
             </div>
-            <span className="font-medium">{profile.nickname ?? 'プロフィール'}</span>
+            <span className="font-medium max-w-[80px] sm:max-w-none truncate">{profile.nickname ?? 'プロフィール'}</span>
           </button>
         </div>
 
-        <div className="flex items-center gap-3 mb-1">
-          <span className="text-5xl">🌿</span>
-          <h1 className="text-4xl font-bold text-green-800">BRANCH LEARNING</h1>
+        <div className="flex items-center gap-2 sm:gap-3 mb-1">
+          <span className="text-4xl sm:text-5xl">🌿</span>
+          <h1 className="text-3xl sm:text-4xl font-bold text-green-800">BRANCH LEARNING</h1>
         </div>
-        <p className="text-green-600 mb-8 text-base">知識のネットワークを広げよう</p>
+        <p className="text-green-600 mb-6 sm:mb-8 text-sm sm:text-base">知識のネットワークを広げよう</p>
 
-        <div className="flex gap-10 mb-10">
+        <div className="flex gap-6 sm:gap-10 mb-6 sm:mb-10">
           <div className="flex flex-col items-center gap-2">
-            <CharacterAvatar character="sensei" size={80} />
+            <CharacterAvatar character="sensei" size={68} />
             <span className="text-sm font-bold text-green-700">Sensei</span>
           </div>
           <div className="flex flex-col items-center gap-2">
-            <CharacterAvatar character="tomo" size={80} />
+            <CharacterAvatar character="tomo" size={68} />
             <span className="text-sm font-bold text-orange-500">Tomo</span>
           </div>
         </div>
 
-        <p className="text-gray-700 text-xl mb-6 font-medium">何年生ですか？</p>
-        <div className="grid grid-cols-3 gap-4">
+        <p className="text-gray-700 text-lg sm:text-xl mb-4 sm:mb-6 font-medium">何年生ですか？</p>
+        <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4 w-full max-w-xs sm:max-w-none">
           {GRADE_LABELS.map((label, i) => (
             <button
               key={i}
               onClick={() => handleGradeSelect(i + 1)}
-              className="bg-white border-2 border-green-400 text-green-800 font-bold text-lg px-8 py-6 rounded-2xl hover:bg-green-500 hover:text-white hover:border-green-500 transition-all shadow-md"
+              className="bg-white border-2 border-green-400 text-green-800 font-bold text-base sm:text-lg px-4 sm:px-8 py-4 sm:py-6 rounded-2xl hover:bg-green-500 hover:text-white hover:border-green-500 transition-all shadow-md active:scale-95"
             >
               {label}
             </button>
@@ -352,7 +354,7 @@ export default function Home() {
   // ── 科目選択 ──────────────────────────────────────────────────────
   if (phase === 'subject') {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-green-50 to-amber-50 flex flex-col items-center justify-center p-8">
+      <div className="min-h-screen bg-gradient-to-b from-green-50 to-amber-50 flex flex-col items-center justify-center p-4 sm:p-8">
         <button
           onClick={() => setPhase('grade')}
           className="absolute top-5 left-5 text-green-600 hover:text-green-800 flex items-center gap-1 text-sm font-medium"
@@ -362,19 +364,19 @@ export default function Home() {
 
         <div className="flex items-center gap-2 mb-1">
           <span className="text-3xl">🌿</span>
-          <h1 className="text-3xl font-bold text-green-800">BRANCH LEARNING</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-green-800">BRANCH LEARNING</h1>
         </div>
-        <p className="text-green-600 mb-8 text-base">今日は何を学ぶ？</p>
+        <p className="text-green-600 mb-6 sm:mb-8 text-sm sm:text-base">今日は何を学ぶ？</p>
 
-        <div className="grid grid-cols-3 gap-3">
+        <div className="grid grid-cols-3 gap-2 sm:gap-3 w-full max-w-xs sm:max-w-sm">
           {SUBJECTS.map((s) => (
             <button
               key={s.id}
               onClick={() => handleSubjectSelect(s.id)}
-              className="bg-white border-2 border-green-200 text-gray-700 font-bold px-5 py-5 rounded-2xl hover:border-green-400 hover:bg-green-50 transition-all shadow-sm flex flex-col items-center gap-2 w-28"
+              className="bg-white border-2 border-green-200 text-gray-700 font-bold py-3 sm:py-5 rounded-2xl hover:border-green-400 hover:bg-green-50 transition-all shadow-sm flex flex-col items-center gap-1 sm:gap-2 active:scale-95"
             >
-              <span className="text-3xl">{s.emoji}</span>
-              <span className="text-sm">{s.id}</span>
+              <span className="text-2xl sm:text-3xl">{s.emoji}</span>
+              <span className="text-xs sm:text-sm">{s.id}</span>
             </button>
           ))}
         </div>
@@ -400,7 +402,7 @@ export default function Home() {
               <span className="text-lg">👤</span>
             )}
           </button>
-          <span className="font-bold text-sm">{profile.nickname ?? 'きみ'}</span>
+          <span className="font-bold text-sm max-w-[70px] sm:max-w-none truncate">{profile.nickname ?? 'きみ'}</span>
         </div>
         <div className="flex items-center gap-2">
           <button
@@ -438,7 +440,7 @@ export default function Home() {
           if (msg.role === 'child') {
             return (
               <div key={msg.id} className="flex justify-end items-end gap-2">
-                <div className="bg-blue-500 text-white px-4 py-3 rounded-2xl rounded-tr-sm max-w-sm text-sm shadow">
+                <div className="bg-blue-500 text-white px-4 py-3 rounded-2xl rounded-tr-sm max-w-[78%] sm:max-w-sm text-sm shadow">
                   {msg.content}
                 </div>
                 <div className="w-8 h-8 rounded-full overflow-hidden bg-green-100 flex-shrink-0 flex items-center justify-center">
@@ -460,7 +462,7 @@ export default function Home() {
                   <CharacterAvatar character={isSensei ? 'sensei' : 'tomo'} size={36} />
                 </div>
                 <div
-                  className={`px-4 py-3 rounded-2xl rounded-tl-sm max-w-sm text-sm shadow ${
+                  className={`px-4 py-3 rounded-2xl rounded-tl-sm max-w-[78%] sm:max-w-sm text-sm shadow ${
                     isSensei ? 'bg-green-100 text-green-900' : 'bg-orange-100 text-orange-900'
                   }`}
                 >
@@ -473,7 +475,7 @@ export default function Home() {
 
               {/* BRANCH発見カード */}
               {msg.branch && (
-                <div className="ml-11 mt-2 bg-gradient-to-r from-green-50 to-yellow-50 border-2 border-green-300 rounded-2xl px-4 py-3 max-w-sm shadow-sm">
+                <div className="ml-11 mt-2 bg-gradient-to-r from-green-50 to-yellow-50 border-2 border-green-300 rounded-2xl px-4 py-3 max-w-[78%] sm:max-w-sm shadow-sm">
                   <div className="flex items-center gap-1.5 mb-1.5">
                     <span className="text-base">🌿</span>
                     <span className="text-xs font-bold text-green-700 tracking-wider uppercase">
@@ -529,7 +531,7 @@ export default function Home() {
             }}
             placeholder="メッセージを入力..."
             disabled={micDisabled}
-            className="flex-1 border border-green-200 rounded-full px-4 py-2.5 text-sm focus:outline-none focus:border-green-400 disabled:opacity-40 bg-gray-50"
+            className="flex-1 border border-green-200 rounded-full px-4 py-2.5 focus:outline-none focus:border-green-400 disabled:opacity-40 bg-gray-50"
           />
           <button
             onClick={() => handleSend(textInput)}
