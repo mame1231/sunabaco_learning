@@ -89,6 +89,16 @@ export default function Home() {
   const [textInput, setTextInput] = useState('')
   const bottomRef = useRef<HTMLDivElement>(null)
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const speechUnlockedRef = useRef(false)
+
+  // iOSはユーザージェスチャーからspeakを呼ばないとブロックされる
+  // 最初のタップ時に空発話でアンロックしておく
+  function unlockSpeech() {
+    if (speechUnlockedRef.current || typeof window === 'undefined') return
+    speechUnlockedRef.current = true
+    const u = new SpeechSynthesisUtterance('')
+    window.speechSynthesis.speak(u)
+  }
   const interimTextRef = useRef('')
   const router = useRouter()
 
@@ -224,6 +234,7 @@ export default function Home() {
   }
 
   function startRecording() {
+    unlockSpeech()
     // HTTPS（またはlocalhost）でないと音声APIは使えない
     if (!window.isSecureContext) {
       alert('音声入力はHTTPS接続が必要です。\nVercelなどのHTTPS環境でお試しください。')
@@ -549,6 +560,7 @@ export default function Home() {
             onKeyDown={(e) => {
               if (e.key === 'Enter' && !e.shiftKey) {
                 e.preventDefault()
+                unlockSpeech()
                 handleSend(textInput)
               }
             }}
@@ -557,7 +569,7 @@ export default function Home() {
             className="flex-1 border border-green-200 rounded-full px-4 py-2.5 focus:outline-none focus:border-green-400 disabled:opacity-40 bg-gray-50"
           />
           <button
-            onClick={() => handleSend(textInput)}
+            onClick={() => { unlockSpeech(); handleSend(textInput) }}
             disabled={micDisabled || !textInput.trim()}
             className="bg-green-500 text-white rounded-full w-10 h-10 flex items-center justify-center hover:bg-green-600 disabled:opacity-40 transition-all text-lg"
           >
